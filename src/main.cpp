@@ -2,27 +2,32 @@
 #include <vector>
 #include <iostream>
 
-
 const int ROWS = 6;
 const int COLS = 7;
 const float HOLE_RADIUS = 20.0f; //  hole radius
-const float SPACING = 60.0f; // Smaller spacing
+const float SPACING = 60.0f;     // Smaller spacing
 const float GRID_WIDTH = COLS * SPACING;
 const float GRID_HEIGHT = ROWS * SPACING;
-const float WINDOW_WIDTH = 800.0f; // Window width
-const float WINDOW_HEIGHT = 600.0f; // Window height 
+const float WINDOW_WIDTH = 800.0f;  // Window width
+const float WINDOW_HEIGHT = 600.0f; // Window height
 
-enum class Player { None, Red, Blue };
+enum class Player
+{
+    None,
+    Red,
+    Blue
+};
 
-class ConnectFour {
+class ConnectFour
+{
 private:
     void draw();
     void handleInput();
     bool dropPiece(int col);
     bool checkWin();
     void reset();
-    void showEndScreen(const std::string& message);
-    
+    void showEndScreen(const std::string &message);
+
     sf::RenderWindow window;
     sf::CircleShape redPiece;
     sf::CircleShape bluePiece;
@@ -34,7 +39,7 @@ private:
     sf::RectangleShape quitButton;
     sf::Text playAgainText;
     sf::Text quitText;
-    std::vector<std::vector<Player> > board;
+    std::vector<std::vector<Player>> board;
     Player currentPlayer;
     bool gameOver;
 
@@ -53,10 +58,10 @@ ConnectFour::ConnectFour()
     redPiece.setFillColor(sf::Color::Red);
     bluePiece.setFillColor(sf::Color::Blue);
 
-    // Load font
-    // if (!font.loadFromFile("arial.ttf")) {
-    //     std::cerr << "Failed to load font!" << std::endl;
-    // }
+    if (!font.loadFromFile("/System/Library/Fonts/Supplemental/Arial.ttf")) // Replace with the path to your font file
+    {
+        std::cout << "Error Loading Font" << std::endl; // Error handling if font fails to load
+    }
 
     // Initialize player labels
     player1Label.setFont(font);
@@ -100,35 +105,52 @@ ConnectFour::ConnectFour()
     quitText.setPosition(quitButton.getPosition().x + 70, quitButton.getPosition().y + 10);
 }
 
-void ConnectFour::run() {
-    while (window.isOpen()) {
+void ConnectFour::run()
+{
+    while (window.isOpen())
+    {
         handleInput();
         draw();
     }
 }
 
-void ConnectFour::handleInput() {
+void ConnectFour::handleInput()
+{
     sf::Event event;
-    while (window.pollEvent(event)) {
-        if (event.type == sf::Event::Closed) {
+    while (window.pollEvent(event))
+    {
+        if (event.type == sf::Event::Closed)
+        {
             window.close();
-        } else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-            if (gameOver) {
+        }
+        else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
+        {
+            if (gameOver)
+            {
                 // Check if "Play Again" or "Quit" is clicked
-                if (playAgainButton.getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y)) {
+                if (playAgainButton.getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y))
+                {
                     reset();
                     gameOver = false;
-                } else if (quitButton.getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y)) {
+                }
+                else if (quitButton.getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y))
+                {
                     window.close();
                 }
-            } else {
+            }
+            else
+            {
                 int col = (event.mouseButton.x - (WINDOW_WIDTH - GRID_WIDTH) / 2) / SPACING; // Adjusted for centered grid
-                if (col >= 0 && col < COLS && dropPiece(col)) {
-                    if (checkWin()) {
+                if (col >= 0 && col < COLS && dropPiece(col))
+                {
+                    if (checkWin())
+                    {
                         std::string winner = (currentPlayer == Player::Red) ? "Player 1 Wins!" : "Player 2 Wins!";
                         showEndScreen(winner);
                         gameOver = true;
-                    } else {
+                    }
+                    else
+                    {
                         currentPlayer = (currentPlayer == Player::Red ? Player::Blue : Player::Red);
                     }
                 }
@@ -137,9 +159,12 @@ void ConnectFour::handleInput() {
     }
 }
 
-bool ConnectFour::dropPiece(int col) {
-    for (int row = ROWS - 1; row >= 0; --row) {
-        if (board[row][col] == Player::None) {
+bool ConnectFour::dropPiece(int col)
+{
+    for (int row = ROWS - 1; row >= 0; --row)
+    {
+        if (board[row][col] == Player::None)
+        {
             board[row][col] = currentPlayer;
             return true;
         }
@@ -147,50 +172,63 @@ bool ConnectFour::dropPiece(int col) {
     return false;
 }
 
-bool ConnectFour::checkWin() {
+bool ConnectFour::checkWin()
+{
     // Check horizontal win
-    for (int row = 0; row < ROWS; ++row) {
-        for (int col = 0; col <= COLS - 4; ++col) {
+    for (int row = 0; row < ROWS; ++row)
+    {
+        for (int col = 0; col <= COLS - 4; ++col)
+        {
             if (board[row][col] == currentPlayer &&
                 board[row][col + 1] == currentPlayer &&
                 board[row][col + 2] == currentPlayer &&
-                board[row][col + 3] == currentPlayer) {
+                board[row][col + 3] == currentPlayer)
+            {
                 return true;
             }
         }
     }
 
     // Check vertical win
-    for (int col = 0; col < COLS; ++col) {
-        for (int row = 0; row <= ROWS - 4; ++row) {
+    for (int col = 0; col < COLS; ++col)
+    {
+        for (int row = 0; row <= ROWS - 4; ++row)
+        {
             if (board[row][col] == currentPlayer &&
                 board[row + 1][col] == currentPlayer &&
                 board[row + 2][col] == currentPlayer &&
-                board[row + 3][col] == currentPlayer) {
+                board[row + 3][col] == currentPlayer)
+            {
                 return true;
             }
         }
     }
 
     // Check diagonal win (top-left to bottom-right)
-    for (int row = 0; row <= ROWS - 4; ++row) {
-        for (int col = 0; col <= COLS - 4; ++col) {
+    for (int row = 0; row <= ROWS - 4; ++row)
+    {
+        for (int col = 0; col <= COLS - 4; ++col)
+        {
             if (board[row][col] == currentPlayer &&
                 board[row + 1][col + 1] == currentPlayer &&
                 board[row + 2][col + 2] == currentPlayer &&
-                board[row + 3][col + 3] == currentPlayer) {
+                board[row + 3][col + 3] == currentPlayer)
+            {
                 return true;
             }
         }
     }
 
     // Check diagonal win (bottom-left to top-right)
-    for (int row = 3; row < ROWS; ++row) {
-        for (int col = 0; col <= COLS - 4; ++col) {
+    for (int row = 3; row < ROWS; ++row)
+    {
+        for (int col = 0; col <= COLS - 4; ++col)
+        {
             if (board[row][col] == currentPlayer &&
                 board[row - 1][col + 1] == currentPlayer &&
                 board[row - 2][col + 2] == currentPlayer &&
-                board[row - 3][col + 3] == currentPlayer) {
+                board[row - 3][col + 3] == currentPlayer)
+            {
                 return true;
             }
         }
@@ -198,45 +236,57 @@ bool ConnectFour::checkWin() {
     return false;
 }
 
-void ConnectFour::reset() {
-    for (auto& row : board) {
+void ConnectFour::reset()
+{
+    for (auto &row : board)
+    {
         std::fill(row.begin(), row.end(), Player::None);
     }
     currentPlayer = Player::Red;
 }
 
-void ConnectFour::showEndScreen(const std::string& message) {
+void ConnectFour::showEndScreen(const std::string &message)
+{
     endMessage.setString(message);
 }
 
-void ConnectFour::draw() {
+void ConnectFour::draw()
+{
     window.clear(sf::Color(105, 105, 105)); // Grey background
 
-    if (gameOver) {
+    if (gameOver)
+    {
         window.draw(endMessage);
         window.draw(playAgainButton);
         window.draw(quitButton);
         window.draw(playAgainText);
         window.draw(quitText);
-    } else {
+    }
+    else
+    {
         // Draw player labels
         window.draw(player1Label);
         window.draw(player2Label);
 
         // Draw the grid, centered in the window
-        for (int row = 0; row < ROWS; ++row) {
-            for (int col = 0; col < COLS; ++col) {
+        for (int row = 0; row < ROWS; ++row)
+        {
+            for (int col = 0; col < COLS; ++col)
+            {
                 sf::CircleShape piece(HOLE_RADIUS);
-                piece.setPosition(col * SPACING + (WINDOW_WIDTH - GRID_WIDTH) / 2, 
+                piece.setPosition(col * SPACING + (WINDOW_WIDTH - GRID_WIDTH) / 2,
                                   row * SPACING + (WINDOW_HEIGHT - GRID_HEIGHT) / 2 + 50); // Adjust for centering
                 piece.setOutlineColor(sf::Color::Black);
                 piece.setOutlineThickness(2);
                 piece.setFillColor(sf::Color::White);
 
                 // Set the fill color based on the player
-                if (board[row][col] == Player::Red) {
+                if (board[row][col] == Player::Red)
+                {
                     piece.setFillColor(sf::Color::Red);
-                } else if (board[row][col] == Player::Blue) {
+                }
+                else if (board[row][col] == Player::Blue)
+                {
                     piece.setFillColor(sf::Color::Blue);
                 }
 
@@ -248,7 +298,8 @@ void ConnectFour::draw() {
     window.display();
 }
 
-int main() {
+int main()
+{
     ConnectFour game;
     game.run();
     return 0;
