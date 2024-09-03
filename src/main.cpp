@@ -2,7 +2,6 @@
 #include <vector>
 #include <iostream>
 
-// using namespace std;
 
 const int ROWS = 6;
 const int COLS = 7;
